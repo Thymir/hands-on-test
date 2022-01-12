@@ -1,7 +1,7 @@
 import re
 from typing import Any, Dict, Match, Optional, Tuple
 
-from api import BooklineAPI
+from api import BooklineAPI, InsertEmailError
 from classifier import Classifier
 
 
@@ -151,7 +151,14 @@ class WhatsappBot:
         
         # 3 - Insert email if we have retrieved it
         if email:
-            self.bookline_api.insert_customer_email(email)
+            try:
+                self.bookline_api.insert_customer_email(email)
+            except InsertEmailError:
+                answer = {
+                    "es": "Ha habido un error. Inténtelo de nuevo más tarde.",
+                    "en": "There has been an error. Please try again later."
+                }
+                next_action = "hangup"
 
         # 4 - Build and return JSON response
         resp = {
