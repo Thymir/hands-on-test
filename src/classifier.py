@@ -4,4 +4,5 @@ class Classifier:
         self.language = language
 
     def extract_intent(self, query: str) -> str:
+        """Given a query, return the detected intent."""
         raise NotImplementedError
