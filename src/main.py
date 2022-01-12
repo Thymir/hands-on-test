@@ -19,3 +19,9 @@ if __name__ == "__main__":
 
     # Conv 5
     my_bot.message("This should not happen, so bot should hangup", "ask_for_card")
+
+    # Example of a full conversation
+    # Conv
+    my_bot.message("Yes, I would like to receive notifications", "newsletter")  # bot status changes to expectingEmail
+    my_bot.message("abc email", "newsletter")  # invalid email, bot status is still expecting email
+    my_bot.message("abc@email.com", "newsletter")  # valid email, bot inserts email and sends hangup
