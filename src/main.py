@@ -2,7 +2,7 @@ from bot import WhatsappBot
 
 if __name__ == "__main__":
 
-    my_bot = WhatsappBot()  # Bot should re instantiated for each conversation
+    my_bot = WhatsappBot(language="en")  # Bot should re instantiated for each conversation
 
     # Conv 1
     my_bot.message("Yes, I would like to receive notifications", "newsletter")
