@@ -1,5 +1,7 @@
-from bot import WhatsappBot
 import unittest
+import sys
+sys.path.append("../src")
+from bot import WhatsappBot
 
 
 class TestWhatsappMessages(unittest.TestCase):

@@ -1,7 +1,5 @@
 # Test considerations
 
-test_message.py can be found in src directory.
-
 The capability to confirm or reject interest while entering the email provoke, in my opinion, some inconsistencies.
 
 I consider that the ability to confirm interest and then do it again is awkward.
