@@ -5,4 +5,5 @@ class Classifier:
 
     def extract_intent(self, query: str) -> str:
         """Given a query, return the detected intent."""
-        raise NotImplementedError
+        return query #  for testing 
+        #raise NotImplementedError

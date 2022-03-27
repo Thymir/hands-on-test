@@ -148,7 +148,7 @@ class WhatsappBot:
             next_action, answer, email = self._ask_for_email_flow(intent, query)
         elif motive == "ask_for_card":
             next_action, answer, email = self._ask_for_card_flow(intent, query)
-        
+
         # 3 - Insert email if we have retrieved it
         if email:
             try:

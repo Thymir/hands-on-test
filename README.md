@@ -1,78 +1,36 @@
-# Code description and Relevant information
+# Test considerations
 
-## Repository Structure
+The capability to confirm or reject interest while entering the email provoke, in my opinion, some inconsistencies.
 
-This repository has a single folder `src` with four files:
+I consider that the ability to confirm interest and then do it again is awkward.
 
-- api.py
-- bot.py
-- classifier.py
-- main.py
+If the user confirms the interest and changes his mind the message displayed would be:
+  "Okay, I hope you enjoy the experience at the restaurant"
+Then the bot wouldn't hangup and upon the next interaction would send:
+  "Thanks for reaching out. I can't help you with anything else yet but if you want to make a reservation you can call the restaurant again"
 
-### api.py
+This last interaction doesn't meet any purpose and does not fit the conversation, as such I considered as wrong in the tests, therefore some tests fail.
 
-Defines class `BooklineAPI` with unimplemented public method `insert_customer_email`.  
-Defines error `InsertEmailError`.
+I would change it, when conversation_status == "expectingEmail" if a rejection is detected then the bot sets next_action to "hangup"
 
-### classifier.py
+# Code changes
 
-Defines class `Classifier` with unimplemented public method `get_intent`.
+## Email detection
 
-### bot.py
+If it's required to detect emails such as:
+    "My email is info@bookline.io"
+Where not only the email is given, then words other than the email shouldn't be considered as part of the email.
 
-Defines class `WhatsappBot` with public method `message`.  
-`WhatsappBot` uses both `Classifier` and `BooklineAPI`.  
-`WhatsappBot` also has several private methods used by `message`.
+The current validate_email function returns:
+  re.match(r"[^@]+@[^@]+\.[^@]+", email)
+Allows spaces mid email, "My email is info@bookline.io" is considered as the whole email.
+I would change it for:
+  re.search(r"[^@\s]+@[^@\s]+\.[^@\s]+", email)
 
-### main.py
+The email can be retrieved with
+  email = self._validate_email(query.strip()).group()
 
-Provides examples of how to use `WhatsappBot` to manage conversations.
+## Redundant code between flows
 
-## WhatsappBot conversation flow
-
-When Bookline receives a new Whatsapp message, it creates a `WhatsappBot` instance to manage this new conversation.  
-A new `WhatsappBot` starts with `conversation_status = "start"`.   
-
-A conversation is handled by `WhatsappBot` as a sequence of interactions.
-Interactions are independent from each other, and the only variable that is stored from one interaction to the next
-is the `conversation_status`. 
-
-### Input
-
-An interaction is passed to `WhatsappBot` via a call to its `message` method - by providing two strings: the user query
-and the conversation motive. **All interactions from the same conversation share the same motive.**
-
-### Conversation Flow
-
-According to the conversation motive, `WhatsappBot.message` handles the user query with a proper conversation flow.
-There are currently three conversation motives, each of them with its correspondent flow:
-
-1. *newsletter* - the conversation starts when a user replies to an automatic message from Bookline asking if they wish to receive
-updates via a newsletter subscription. If the user confirms their interest, the bot asks for an email address.
-2. *ask_for_email* - the conversation starts when a user replies to an automatic message from Bookline asking for an email address
-3. *ask_for_card* - this conversation flow is not implemented yet, so any conversation started with this motive triggers
-a hangup reply from the bot  
-
-### Output
-
-`WhatsappBot` provides a response to query in the form of a `JSON` with an answer
-(consisting of an id and a string) and a next action to perform.  
-This output will be then handled by another service.
-
-The bot continues to process interactions until it decides to send out a **hangup** response.  
-At that time the `WhatsappBot` is destroyed and the conversation ends.
-
-# Task
-
-Your task is to plan and implement a test structure to ensure that `WhatsappBot` behaves correctly when handling
-a few default conversations, as well as achieving a high degree of code coverage. To do that, you will need to
-
-1. **Plan the tests**
-    - By looking at the code, write down sample conversations that you consider should be implemented as tests in order to achieve a high degree of coverage of `WhatsappBot`
-    - `main.py` has five examples of how a conversation might start, as well as an example of a full conversation (only the user input)
-2. **Implement the tests**
-    - Using unittest, implement one or more of your full-conversation tests
-    - You will need to mock calls to `Classifier` and `BooklineAPI` methods - methods for these classes are not implemented,
-    so we need to mock them in order to perform the tests.
-3. **(Optional) Suggest improvements to the code of `WhatsappBot`**
-    - In case you see something that you consider could/should be improved, feel free to point it out!
+There is redundant code for asking for the email. This could be in a function for both to call.
+Another solution is to call a specific conversation flow based on your conversation_status which I think would lead into cleaner code.
